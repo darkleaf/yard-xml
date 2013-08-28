@@ -18,7 +18,18 @@
 
 def init
   xml = options[:xml_builder]
-  xml.class(:name => object.name, :superclass => object.superclass.name) do
+  xml.class(:name => object.name, :superclass => object.superclass.path) do
+
+    [:instance_mixins, :class_mixins].each do |type|
+      if object.send(type).any?
+        xml.tag!(type)  do
+          object.send(type).each do |item|
+            xml.module name: item.path
+          end
+        end
+      end
+    end
+
     xml.summary(docstring_summary(object))
     xml.description do
       xml.cdata!(html_markup_rdoc(object.docstring))

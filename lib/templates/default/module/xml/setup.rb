@@ -19,6 +19,17 @@
 def init
   xml = options[:xml_builder]
   xml.module(:name => object.name) do
+
+    [:instance_mixins, :class_mixins].each do |type|
+      if object.send(type).any?
+        xml.tag!(type)  do
+          object.send(type).each do |item|
+            xml.module name: item.path
+          end
+        end
+      end
+    end
+
     if object.respond_to?(:children)
       object.children.sort_by do |child|
         [
