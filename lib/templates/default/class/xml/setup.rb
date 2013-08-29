@@ -20,14 +20,12 @@ def init
   xml = options[:xml_builder]
   xml.class(:name => object.name, :superclass => object.superclass.path) do
 
-    [:instance_mixins, :class_mixins].each do |type|
-      if object.send(type).any?
-        xml.tag!(type)  do
-          object.send(type).each do |item|
-            xml.module name: item.path
-          end
-        end
-      end
+    object.instance_mixins.each do |mixin|
+      xml.instance_mixin mixin.path
+    end
+
+    object.class_mixins.each do |mixin|
+      xml.class_mixin mixin.path
     end
 
     xml.summary(docstring_summary(object))
